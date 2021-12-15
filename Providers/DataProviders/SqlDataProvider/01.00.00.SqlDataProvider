@@ -1,0 +1,267 @@
+﻿/************************************************************/
+/*****              SqlDataProvider                     *****/
+/*****                                                  *****/
+/*****                                                  *****/
+/***** Note: To manually execute this script you must   *****/
+/*****       perform a search and replace operation     *****/
+/*****       for {databaseOwner} and {objectQualifier}  *****/
+/*****                                                  *****/
+/************************************************************/
+
+IF  NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}[{objectQualifier}TabbedSearch_Tabs]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE {databaseOwner}{objectQualifier}TabbedSearch_Tabs
+		(
+		TabId int NOT NULL IDENTITY (1, 1),
+		TabName nvarchar(100) NOT NULL,
+		ParameterName nvarchar(20) NOT NULL,
+		SearchUrl nvarchar(255) NOT NULL,
+		AutoCompleteParameterName nvarchar(20) NOT NULL,
+		AutoCompleteUrl nvarchar(255) NULL,
+		CustomName nvarchar(20) NULL,
+		CustomValue nvarchar(50) NULL,
+		Target nvarchar(10) NOT NULL,
+		Parameterless bit NOT NULL,
+		ModuleId int NOT NULL,
+		CreatedOnDate datetime NOT NULL,
+		CreatedByUserId int NOT NULL,
+		LastModifiedOnDate datetime NOT NULL,
+		LastModifiedByUserId int NOT NULL
+		)  ON [PRIMARY]
+		 TEXTIMAGE_ON [PRIMARY]
+		 
+	ALTER TABLE {databaseOwner}{objectQualifier}TabbedSearch_Tabs ADD CONSTRAINT
+		PK_{objectQualifier}TabbedSearch_Tabs PRIMARY KEY CLUSTERED 
+		(
+		TabId
+		) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+
+	ALTER TABLE {databaseOwner}{objectQualifier}TabbedSearch_Tabs ADD  CONSTRAINT [DF_{objectQualifier}TabbedSearch_Tabs_Parameterless]  DEFAULT (0) FOR Parameterless
+	
+END
+GO
+
+IF  NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{databaseOwner}[{objectQualifier}TabbedSearch_QuickLinks]') AND type in (N'U'))
+BEGIN
+	CREATE TABLE {databaseOwner}{objectQualifier}TabbedSearch_QuickLinks
+		(
+		LinkId int NOT NULL IDENTITY (1, 1),
+		LinkText nvarchar(100) NOT NULL,
+		LinkUrl nvarchar(255) NOT NULL,
+		Target nvarchar(10) NOT NULL,
+		ModuleId int NOT NULL,
+		CreatedOnDate datetime NOT NULL,
+		CreatedByUserId int NOT NULL,
+		LastModifiedOnDate datetime NOT NULL,
+		LastModifiedByUserId int NOT NULL
+		)  ON [PRIMARY]
+		 TEXTIMAGE_ON [PRIMARY]
+		 
+	ALTER TABLE {databaseOwner}{objectQualifier}TabbedSearch_QuickLinks ADD CONSTRAINT
+		PK_{objectQualifier}TabbedSearch_QuickLinks PRIMARY KEY CLUSTERED 
+		(
+		LinkId
+		) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_AddTab]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_AddTab]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_UpdateTab]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_UpdateTab]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_DeleteTab]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_DeleteTab]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_GetTab]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_GetTab]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_GetTabs]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_GetTabs]
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_AddTab
+	@TabName nvarchar(100),
+	@ParameterName nvarchar(20),
+	@SearchUrl nvarchar(255),
+	@AutoCompleteParameterName nvarchar(20),
+	@AutoCompleteUrl nvarchar(255),
+	@CustomName nvarchar(20),
+	@CustomValue nvarchar(50),
+	@Target nvarchar(10),
+	@Parameterless bit,
+	@ModuleId int,
+	@CreatedByUserId int
+AS
+BEGIN
+	INSERT INTO {databaseOwner}{objectQualifier}TabbedSearch_Tabs
+	(TabName, ParameterName, SearchUrl, AutoCompleteParameterName, AutoCompleteUrl, CustomName, CustomValue, Target, Parameterless, ModuleId, CreatedOnDate, CreatedByUserId, LastModifiedOnDate, LastModifiedByUserId)
+	VALUES (@TabName, @ParameterName, @SearchUrl, @AutoCompleteParameterName, @AutoCompleteUrl, @CustomName, @CustomValue, @Target, @Parameterless, @ModuleId, getdate(), @CreatedByUserId, getdate(), @CreatedByUserId)
+	SELECT @@IDENTITY
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_UpdateTab
+	@TabId int,
+	@TabName nvarchar(100),
+	@ParameterName nvarchar(20),
+	@SearchUrl nvarchar(255),
+	@AutoCompleteParameterName nvarchar(20),
+	@AutoCompleteUrl nvarchar(255),
+	@CustomName nvarchar(20),
+	@CustomValue nvarchar(50),
+	@Target nvarchar(10),
+	@Parameterless bit,
+	@ModuleId int,
+	@LastModifiedByUserId int
+AS
+BEGIN
+	UPDATE {databaseOwner}{objectQualifier}TabbedSearch_Tabs
+	SET TabName = @TabName, 
+		ParameterName = @ParameterName,
+		SearchUrl = @SearchUrl,
+		AutoCompleteParameterName = @AutoCompleteParameterName,
+		AutoCompleteUrl = @AutoCompleteUrl,
+		CustomName = @CustomName,
+		CustomValue = @CustomValue,
+		Target = @Target,
+		Parameterless = @Parameterless,
+		ModuleId = @ModuleId, 
+		LastModifiedOnDate = getdate(),
+		LastModifiedByUserId = @LastModifiedByUserId
+	WHERE TabId = @TabId
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_DeleteTab
+	@TabId int
+AS
+BEGIN
+	DELETE FROM {databaseOwner}{objectQualifier}TabbedSearch_Tabs WHERE TabId = @TabId
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_GetTab
+	@TabId int
+AS
+BEGIN
+	SELECT * FROM {databaseOwner}{objectQualifier}TabbedSearch_Tabs WHERE TabId = @TabId
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_GetTabs
+	@ModuleId int
+AS
+BEGIN
+	SELECT * FROM {databaseOwner}{objectQualifier}TabbedSearch_Tabs WHERE ModuleId = @ModuleID ORDER BY TabId
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_AddLink]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_AddLink]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_UpdateLink]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_UpdateLink]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_DeleteLink]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_DeleteLink]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_GetLink]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_GetLink]
+END
+GO
+
+IF EXISTS (SELECT * FROM dbo.sysobjects WHERE id = object_id(N'{databaseOwner}[{objectQualifier}TabbedSearch_GetLinks]') and OBJECTPROPERTY(id, N'IsProcedure') = 1)
+BEGIN
+	DROP PROCEDURE {databaseOwner}[{objectQualifier}TabbedSearch_GetLinks]
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_AddLink
+	@LinkText nvarchar(100),
+	@LinkUrl nvarchar(255),
+	@Target nvarchar(10),
+	@ModuleId int,
+	@CreatedByUserId int
+AS
+BEGIN
+	INSERT INTO {databaseOwner}{objectQualifier}TabbedSearch_QuickLinks
+	(LinkText, LinkUrl, Target, ModuleId, CreatedOnDate, CreatedByUserId, LastModifiedOnDate, LastModifiedByUserId)
+	VALUES (@LinkText, @LinkUrl, @Target, @ModuleId, getdate(), @CreatedByUserId, getdate(), @CreatedByUserId)
+	SELECT @@IDENTITY
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_UpdateLink
+	@LinkId int,
+	@LinkText nvarchar(100),
+	@LinkUrl nvarchar(255),
+	@Target nvarchar(10),
+	@ModuleId int,
+	@LastModifiedByUserId int
+AS
+BEGIN
+	UPDATE {databaseOwner}{objectQualifier}TabbedSearch_QuickLinks
+	SET LinkText = @LinkText, 
+		LinkUrl = @LinkUrl,
+		Target = @Target,
+		ModuleId = @ModuleId, 
+		LastModifiedOnDate = getdate(),
+		LastModifiedByUserId = @LastModifiedByUserId
+	WHERE LinkId = @LinkId
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_DeleteLink
+	@LinkId int
+AS
+BEGIN
+	DELETE FROM {databaseOwner}{objectQualifier}TabbedSearch_QuickLinks WHERE LinkId = @LinkId
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_GetLink
+	@LinkId int
+AS
+BEGIN
+	SELECT * FROM {databaseOwner}{objectQualifier}TabbedSearch_QuickLinks WHERE LinkId = @LinkId
+END
+GO
+
+CREATE PROCEDURE {databaseOwner}{objectQualifier}TabbedSearch_GetLinks
+	@ModuleId int
+AS
+BEGIN
+	SELECT * FROM {databaseOwner}{objectQualifier}TabbedSearch_QuickLinks WHERE ModuleId = @ModuleID ORDER BY LinkId
+END
+GO
+
+/************************************************************/
+/*****              SqlDataProvider                     *****/
+/************************************************************/
+
