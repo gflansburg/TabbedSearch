@@ -548,7 +548,7 @@ fieldset.commands { border:none; }
 }
 
 /* tabbed search */
-#tabbedHeader .headerRow #headerSearch > #tabbedSearch { position: relative; top: 34px; left: -5px; /* match the height of the list items in ul.nav-tabs */ }
+#tabbedHeader .headerRow #headerSearch > #tabbedSearch { position: relative; top: 34px; left: -4px; /* match the height of the list items in ul.nav-tabs */ }
 #tabbedHeader .headerRow #headerSearch > #tabbedSearch .tabbedsearch {
     background-image:url(Images/bg_black.gif);
     background-repeat:repeat;
