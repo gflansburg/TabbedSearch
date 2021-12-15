@@ -139,7 +139,7 @@
     <value>Parameter Value</value>
   </data>
   <data name="lblParameterless.Help" xml:space="preserve">
-    <value>Use a friendly URL string</value>
+    <value>Use a friendly URL string via URL Rewrite</value>
   </data>
   <data name="lblParameterless.Text" xml:space="preserve">
     <value>Friendly URL</value>
